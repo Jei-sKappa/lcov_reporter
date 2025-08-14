@@ -8,3 +8,6 @@ example_todos.json
 
 ## Ignore coverage test directory
 coverage/test
+
+## Ignore coverage html directory
+coverage/html
