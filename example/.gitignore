@@ -5,3 +5,6 @@
 # Custom
 ## Ignore example_todos.json
 example_todos.json
+
+## Ignore coverage test directory
+coverage/test
