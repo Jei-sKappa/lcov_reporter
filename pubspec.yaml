@@ -1,0 +1,14 @@
+name: lcov_reporter
+description: Generates clean, readable, AI-ready Markdown reports from LCOV coverage files.
+version: 1.0.0
+repository: https://github.com/Jei-sKappa/lcov_reporter
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  args: ^2.5.0
+
+dev_dependencies:
+  test: ^1.24.0
+  very_good_analysis: ^8.0.0
