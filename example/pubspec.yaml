@@ -1,0 +1,12 @@
+name: example
+description: Example project for the lcov_reporter package.
+version: 1.0.0
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+
+dev_dependencies:
+  test: ^1.24.0
+  very_good_analysis: ^8.0.0
