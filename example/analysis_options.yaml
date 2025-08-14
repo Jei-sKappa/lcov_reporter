@@ -2,5 +2,11 @@ include: package:very_good_analysis/analysis_options.yaml
 
 linter:
   rules:
+    # This is an Example app so we don't need to document the public members
+    public_member_api_docs: false
+    # This is a CLI app, so we need to print stuff
+    avoid_print: false
+    # In this example, we use positional boolean parameters for simplicity
+    avoid_positional_boolean_parameters: false
     # I prefer to specify the arguments explicitly to be clear
     avoid_redundant_argument_values: false
