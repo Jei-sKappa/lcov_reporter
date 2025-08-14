@@ -348,7 +348,7 @@ void main() {
 
   group('TodoExample Integration Tests', () {
     late TodoExample example;
-    const testFile = 'integration_test_todos.json';
+    const testFile = 'example_todos.json';
 
     setUp(() {
       example = TodoExample();
@@ -364,7 +364,7 @@ void main() {
     test('should run example without errors', () async {
       // This only tests the basic run method, not demonstrateErrorHandling,
       // demonstrateBulkOperations, or cleanup methods
-      expect(() => example.run(), returnsNormally);
+      await expectLater(example.run(), completes);
     });
 
     // Note: Not testing demonstrateErrorHandling, demonstrateBulkOperations,
