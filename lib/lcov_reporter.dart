@@ -80,6 +80,19 @@ bool _areAllFilesCovered(_CoverageData coverageData) {
   );
 }
 
+/// Calculates the total coverage percentage across all files
+String _calculateTotalCoverage(_CoverageData coverageData) {
+  var totalLines = 0;
+  var totalCovered = 0;
+
+  for (final fileData in coverageData.values) {
+    totalLines += fileData['total'] as int;
+    totalCovered += fileData['covered'] as int;
+  }
+
+  return _formatPercentage(totalCovered, totalLines);
+}
+
 /// Groups consecutive line numbers into separate lists
 List<List<int>> _groupConsecutiveLines(List<int> lineNumbers) {
   if (lineNumbers.isEmpty) return [];
@@ -179,7 +192,11 @@ Future<String> _generateCodeBlock(
 
 /// Generates the complete markdown report from coverage data
 Future<String> _generateMarkdownReport(_CoverageData coverageData) async {
-  final md = StringBuffer()..writeln('# Uncovered Code Report\n');
+  final md = StringBuffer()..writeln('# LCOV Reporter\n');
+
+  // Calculate total coverage across all files
+  final totalCoverage = _calculateTotalCoverage(coverageData);
+  md.writeln('## Total Coverage: $totalCoverage\n');
 
   if (_areAllFilesCovered(coverageData)) {
     md.writeln('CODE FULLY COVERED!');
