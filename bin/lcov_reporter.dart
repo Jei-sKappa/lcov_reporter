@@ -36,14 +36,14 @@ ArgParser buildParser() {
       defaultsTo: 'coverage/lcov.info',
     )
     ..addOption('output', abbr: 'o', help: 'Output file path (default: stdout)')
-    ..addOption('exclude', help: 'Exclude files matching pattern (glob)')
-    ..addFlag(
-      'uncovered-only',
-      negatable: false,
-      help: 'Show only files with uncovered lines',
+    ..addOption(
+      'exclude',
+      abbr: 'e',
+      help: 'Exclude files matching pattern (glob)',
     )
     ..addOption(
       'fail-under',
+      abbr: 'f',
       help: 'Exit with error if coverage below threshold (percentage)',
     )
     ..addFlag(
@@ -51,6 +51,11 @@ ArgParser buildParser() {
       abbr: 's',
       negatable: false,
       help: 'Show summary with individual file coverage',
+    )
+    ..addFlag(
+      'uncovered-only',
+      negatable: false,
+      help: 'Show only files with uncovered lines',
     )
     ..addFlag(
       'no-filter',
