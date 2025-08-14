@@ -11,7 +11,7 @@ const String version = '1.0.0';
 /// - Help and version flags
 /// - Input/output file paths
 /// - Filtering options (exclude patterns, uncovered-only)
-/// - Coverage thresholds and quiet mode
+/// - Coverage thresholds and summary mode
 ///
 /// Returns a configured [ArgParser] instance ready to parse arguments.
 ArgParser buildParser() {
@@ -47,10 +47,10 @@ ArgParser buildParser() {
       help: 'Exit with error if coverage below threshold (percentage)',
     )
     ..addFlag(
-      'quiet',
-      abbr: 'q',
+      'summary',
+      abbr: 's',
       negatable: false,
-      help: 'Minimal output (summary only)',
+      help: 'Show summary with individual file coverage',
     );
 }
 
@@ -80,7 +80,7 @@ void printVersion() {
 /// - `--exclude`: Exclude files matching pattern
 /// - `--uncovered-only`: Show only files with uncovered lines
 /// - `--fail-under`: Exit with error if coverage below threshold
-/// - `-q, --quiet`: Minimal output mode
+/// - `-s, --summary`: Show summary with individual file coverage
 ///
 /// [arguments]: Command line arguments to parse.
 ///
@@ -93,7 +93,7 @@ void printVersion() {
 /// ```bash
 /// dart run lcov_reporter.dart --input coverage/lcov.info --output report.md
 /// dart run lcov_reporter.dart --exclude "**/test/**" --fail-under 80
-/// dart run lcov_reporter.dart --quiet --uncovered-only
+/// dart run lcov_reporter.dart --summary --uncovered-only
 /// ```
 Future<void> main(List<String> arguments) async {
   final argParser = buildParser();
@@ -140,7 +140,7 @@ Future<void> main(List<String> arguments) async {
       excludePattern: results.option('exclude'),
       uncoveredOnly: results.flag('uncovered-only'),
       failUnder: failUnder,
-      quiet: results.flag('quiet'),
+      summary: results.flag('summary'),
     );
 
     await lcov_reporter.run(config);

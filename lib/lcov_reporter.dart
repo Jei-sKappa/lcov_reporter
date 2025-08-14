@@ -20,7 +20,7 @@ typedef _CoverageData = Map<String, Map<String, dynamic>>;
 ///   excludePattern: '**/test/**',
 ///   uncoveredOnly: true,
 ///   failUnder: 80.0,
-///   quiet: false,
+///   summary: false,
 /// );
 /// ```
 class ReporterConfig {
@@ -33,7 +33,7 @@ class ReporterConfig {
     this.excludePattern,
     this.uncoveredOnly = false,
     this.failUnder,
-    this.quiet = false,
+    this.summary = false,
   });
 
   /// Path to the input LCOV file.
@@ -67,11 +67,11 @@ class ReporterConfig {
   /// Must be between 0.0 and 100.0.
   final double? failUnder;
 
-  /// Whether to output minimal summary information only.
+  /// Whether to output summary with individual file coverage.
   ///
-  /// When `true`, shows just coverage percentage and file counts
+  /// When `true`, shows individual file coverage percentages and total
   /// instead of the full detailed report.
-  final bool quiet;
+  final bool summary;
 }
 
 /// Main entry point for the LCOV reporter.
@@ -383,7 +383,7 @@ bool _matchesPattern(String path, String pattern) {
 /// file,
 /// creating parent directories as needed. Otherwise, prints to stdout.
 ///
-/// Shows a confirmation message when writing to file (unless in quiet mode).
+/// Shows a confirmation message when writing to file (unless in summary mode).
 ///
 /// [report]: The generated markdown report content.
 /// [config]: Configuration containing output settings.
@@ -394,7 +394,7 @@ Future<void> _outputReport(String report, ReporterConfig config) async {
     final file = File(config.outputPath!);
     await file.parent.create(recursive: true);
     await file.writeAsString(report);
-    if (!config.quiet) {
+    if (!config.summary) {
       print('Report written to ${config.outputPath}');
     }
   } else {
@@ -553,7 +553,7 @@ Future<String> _generateCodeBlock(
 /// Creates either a detailed markdown report or a summary based on the
 /// configuration. The report includes:
 /// - Overall coverage percentage
-/// - Per-file coverage details (unless in quiet mode)
+/// - Per-file coverage details (unless in summary mode)
 /// - Code blocks showing uncovered lines with syntax highlighting
 /// - Special message for 100% coverage
 ///
@@ -562,9 +562,9 @@ Future<String> _generateCodeBlock(
 ///
 /// Returns the complete markdown report as a string.
 ///
-/// In quiet mode, returns only a brief summary with total coverage
-/// and file counts. In normal mode, returns a detailed report with
-/// uncovered code blocks for each file.
+/// In summary mode, returns individual file coverage percentages and total.
+/// In normal mode, returns a detailed report with uncovered code blocks for
+/// each file.
 Future<String> _generateMarkdownReport(
   _CoverageData coverageData,
   ReporterConfig config,
@@ -574,14 +574,22 @@ Future<String> _generateMarkdownReport(
   // Calculate total coverage across all files
   final totalCoverage = _calculateTotalCoverage(coverageData);
 
-  if (config.quiet) {
-    // Quiet mode: just show summary
+  if (config.summary) {
+    // Summary mode: show individual file coverage and total
+    for (final entry in coverageData.entries) {
+      final fileData = entry.value;
+
+      final total = fileData['total'] as int;
+      final covered = fileData['covered'] as int;
+
+      // If the file is fully covered, skip it
+      if (covered == total) continue;
+
+      final relativePath = _makeRelativePath(entry.key);
+      final coverage = _formatPercentage(covered, total);
+      md.writeln("File '$relativePath' coverage: $coverage");
+    }
     md.writeln('Total Coverage: $totalCoverage');
-    final fileCount = coverageData.length;
-    final uncoveredFiles = coverageData.values
-        .where((file) => (file['uncoveredLines'] as List<int>).isNotEmpty)
-        .length;
-    md.writeln('Files: $fileCount total, $uncoveredFiles with uncovered lines');
     return md.toString();
   }
 
