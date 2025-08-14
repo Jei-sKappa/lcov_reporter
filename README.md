@@ -1,3 +1,3 @@
-# LCOV Reporter
+# Buggy
 
 Coming soon...

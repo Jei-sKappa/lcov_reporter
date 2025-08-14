@@ -1,4 +1,4 @@
-# LCOV Reporter
+# Buggy
 
 ## Total Coverage: 84.2%
 

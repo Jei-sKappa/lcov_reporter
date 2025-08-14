@@ -1,4 +1,4 @@
-SF:/Users/jac/Developer/projects/personal/lcov_reporter/example/lib/todo.dart
+SF:/Users/jac/Developer/projects/personal/buggy/example/lib/todo.dart
 DA:7,2
 DA:15,1
 DA:16,1
@@ -43,7 +43,7 @@ DA:101,1
 LF:41
 LH:41
 end_of_record
-SF:/Users/jac/Developer/projects/personal/lcov_reporter/example/lib/todo_manager.dart
+SF:/Users/jac/Developer/projects/personal/buggy/example/lib/todo_manager.dart
 DA:8,1
 DA:9,2
 DA:13,1
@@ -69,7 +69,7 @@ DA:47,0
 LF:22
 LH:16
 end_of_record
-SF:/Users/jac/Developer/projects/personal/lcov_reporter/example/lib/user.dart
+SF:/Users/jac/Developer/projects/personal/buggy/example/lib/user.dart
 DA:6,2
 DA:9,1
 DA:10,3

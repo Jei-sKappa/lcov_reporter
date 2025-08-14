@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:args/args.dart';
-import 'package:lcov_reporter/lcov_reporter.dart' as lcov_reporter;
+import 'package:buggy/buggy.dart' as buggy;
 
-/// Current version of the LCOV Reporter tool.
+/// Current version of the Buggy tool.
 const String version = '1.0.0';
 
 /// Builds and configures the command line argument parser.
@@ -71,16 +71,16 @@ ArgParser buildParser() {
 ///
 /// [argParser]: The configured argument parser to extract usage from.
 void printUsage(ArgParser argParser) {
-  print('Usage: dart lcov_reporter.dart <flags> [arguments]');
+  print('Usage: dart buggy.dart <flags> [arguments]');
   print(argParser.usage);
 }
 
-/// Prints the current version of the LCOV Reporter tool.
+/// Prints the current version of the Buggy tool.
 void printVersion() {
-  print('lcov_reporter version: $version');
+  print('buggy version: $version');
 }
 
-/// Main entry point for the LCOV Reporter command line tool.
+/// Main entry point for the Buggy command line tool.
 ///
 /// Parses command line arguments and executes the coverage report generation.
 /// Handles the following options:
@@ -103,10 +103,10 @@ void printVersion() {
 ///
 /// Example usage:
 /// ```bash
-/// dart run lcov_reporter.dart --input coverage/lcov.info --output report.md
-/// dart run lcov_reporter.dart --exclude "**/test/**" --fail-under 80
-/// dart run lcov_reporter.dart --summary --uncovered-only
-/// dart run lcov_reporter.dart --no-filter --output raw_report.md
+/// dart run buggy.dart --input coverage/lcov.info --output report.md
+/// dart run buggy.dart --exclude "**/test/**" --fail-under 80
+/// dart run buggy.dart --summary --uncovered-only
+/// dart run buggy.dart --no-filter --output raw_report.md
 /// ```
 Future<void> main(List<String> arguments) async {
   final argParser = buildParser();
@@ -147,7 +147,7 @@ Future<void> main(List<String> arguments) async {
     }
 
     // Create configuration
-    final config = lcov_reporter.ReporterConfig(
+    final config = buggy.BuggyConfig(
       inputPath: results.option('input')!,
       outputPath: results.option('output'),
       excludePattern: results.option('exclude'),
@@ -157,7 +157,7 @@ Future<void> main(List<String> arguments) async {
       noFilter: results.flag('no-filter'),
     );
 
-    await lcov_reporter.run(config);
+    await buggy.run(config);
   } on FormatException catch (e) {
     // Print usage information if an invalid argument was provided.
     print(e.message);

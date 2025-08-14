@@ -1,6 +1,6 @@
-# LCOV Reporter Example
+# Buggy Example
 
-This example demonstrates the LCOV Reporter tool by implementing a comprehensive Todo management system with intentional coverage gaps.
+This example demonstrates the Buggy tool by implementing a comprehensive Todo management system with intentional coverage gaps.
 
 ## What This Example Demonstrates
 
@@ -50,12 +50,12 @@ The example includes:
 
 4. **Generate coverage report:**
    ```bash
-   dart run lcov_reporter:lcov_reporter
+   dart run buggy:buggy
    ```
 
 ## Expected Coverage Report
 
-When you run the LCOV Reporter on this example, you should see output similar to the format shown in the main project, with multiple files having partial coverage and specific uncovered code blocks highlighted.
+When you run the Buggy on this example, you should see output similar to the format shown in the main project, with multiple files having partial coverage and specific uncovered code blocks highlighted.
 
 The uncovered code includes:
 
@@ -66,4 +66,4 @@ The uncovered code includes:
 - **Data integrity checks** that run in background processes
 - **Error logging and monitoring** code paths
 
-This demonstrates how the LCOV Reporter helps identify code that may need additional testing or could potentially be removed if truly unreachable.
+This demonstrates how the Buggy helps identify code that may need additional testing or could potentially be removed if truly unreachable.

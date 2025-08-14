@@ -1,7 +1,7 @@
-name: lcov_reporter
+name: buggy
 description: Generates clean, readable, AI-ready Markdown reports from LCOV coverage files.
 version: 1.0.0
-repository: https://github.com/Jei-sKappa/lcov_reporter
+repository: https://github.com/Jei-sKappa/buggy
 
 environment:
   sdk: ^3.8.1

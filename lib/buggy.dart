@@ -8,13 +8,13 @@ import 'dart:io';
 /// - `uncoveredLines`: List of uncovered line numbers
 typedef _CoverageData = Map<String, Map<String, dynamic>>;
 
-/// Configuration class for the LCOV reporter.
+/// Configuration class for the Buggy.
 ///
 /// Defines all the settings and options for generating coverage reports.
 ///
 /// Example:
 /// ```dart
-/// final config = ReporterConfig(
+/// final config = BuggyConfig(
 ///   inputPath: 'coverage/lcov.info',
 ///   outputPath: 'coverage_report.md',
 ///   excludePattern: '**/test/**',
@@ -24,11 +24,11 @@ typedef _CoverageData = Map<String, Map<String, dynamic>>;
 ///   noFilter: false,
 /// );
 /// ```
-class ReporterConfig {
+class BuggyConfig {
   /// Creates a new reporter configuration.
   ///
   /// All parameters are optional and have sensible defaults.
-  const ReporterConfig({
+  const BuggyConfig({
     this.inputPath = 'coverage/lcov.info',
     this.outputPath,
     this.excludePattern,
@@ -127,7 +127,7 @@ bool _shouldFilterLine(String filePath, String lineContent) {
   return false;
 }
 
-/// Main entry point for the LCOV reporter.
+/// Main entry point for the Buggy.
 ///
 /// Generates a coverage report based on the provided [config].
 /// If no configuration is provided, uses default settings.
@@ -145,7 +145,7 @@ bool _shouldFilterLine(String filePath, String lineContent) {
 /// await run();
 ///
 /// // Use custom configuration
-/// final config = ReporterConfig(
+/// final config = BuggyConfig(
 ///   inputPath: 'my_coverage.info',
 ///   outputPath: 'report.md',
 ///   failUnder: 80.0,
@@ -155,8 +155,8 @@ bool _shouldFilterLine(String filePath, String lineContent) {
 ///
 /// Throws [Exception] if the input file doesn't exist or is malformed.
 /// Exits with code 1 if coverage is below the threshold specified in [config].
-Future<void> run([ReporterConfig? config]) async {
-  final cfg = config ?? const ReporterConfig();
+Future<void> run([BuggyConfig? config]) async {
+  final cfg = config ?? const BuggyConfig();
 
   final coverageData = await _readCoverageData(cfg.inputPath);
   final filteredData = _applyFilters(coverageData, cfg);
@@ -363,13 +363,13 @@ double _calculateTotalCoverageValue(_CoverageData coverageData) {
 ///
 /// Example:
 /// ```dart
-/// final config = ReporterConfig(
+/// final config = BuggyConfig(
 ///   excludePattern: '**/test/**',
 ///   uncoveredOnly: true,
 /// );
 /// final filtered = _applyFilters(rawData, config);
 /// ```
-_CoverageData _applyFilters(_CoverageData coverageData, ReporterConfig config) {
+_CoverageData _applyFilters(_CoverageData coverageData, BuggyConfig config) {
   final filtered = <String, Map<String, dynamic>>{};
 
   for (final entry in coverageData.entries) {
@@ -432,7 +432,7 @@ bool _matchesPattern(String path, String pattern) {
 
 /// Outputs the generated report to file or stdout.
 ///
-/// If [ReporterConfig.outputPath] is specified, writes the [report] to that
+/// If [BuggyConfig.outputPath] is specified, writes the [report] to that
 /// file,
 /// creating parent directories as needed. Otherwise, prints to stdout.
 ///
@@ -442,7 +442,7 @@ bool _matchesPattern(String path, String pattern) {
 /// [config]: Configuration containing output settings.
 ///
 /// Throws [Exception] if file writing fails.
-Future<void> _outputReport(String report, ReporterConfig config) async {
+Future<void> _outputReport(String report, BuggyConfig config) async {
   if (config.outputPath != null) {
     final file = File(config.outputPath!);
     await file.parent.create(recursive: true);
@@ -584,7 +584,7 @@ String _detectLanguageFromExtension(String filePath) {
 Future<String> _generateCodeBlock(
   List<int> lineNumbers,
   String filePath,
-  ReporterConfig config,
+  BuggyConfig config,
 ) async {
   final sourceFile = File(filePath);
   var sourceLines = <String>[];
@@ -601,7 +601,8 @@ Future<String> _generateCodeBlock(
     } else {
       final code = sourceLines[lineNum - 1];
 
-      // Add only if the line should not be filtered out (unless filtering is disabled)
+      // Add only if the line should not be filtered out (unless filtering is
+      // disabled)
       if (config.noFilter || !_shouldFilterLine(filePath, code)) {
         codeLines.add('${lineNum.toString().padLeft(4)}: $code');
       }
@@ -638,7 +639,7 @@ Future<String> _generateCodeBlock(
 /// each file.
 Future<String> _generateMarkdownReport(
   _CoverageData coverageData,
-  ReporterConfig config,
+  BuggyConfig config,
 ) async {
   final md = StringBuffer();
 
@@ -665,7 +666,7 @@ Future<String> _generateMarkdownReport(
   }
 
   md
-    ..writeln('# LCOV Reporter\n')
+    ..writeln('# Buggy Report\n')
     ..writeln('## Total Coverage: $totalCoverage\n');
 
   if (_areAllFilesCovered(coverageData)) {
