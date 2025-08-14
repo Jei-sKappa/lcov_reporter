@@ -393,7 +393,9 @@ Future<void> _outputReport(String report, ReporterConfig config) async {
   if (config.outputPath != null) {
     final file = File(config.outputPath!);
     await file.parent.create(recursive: true);
-    await file.writeAsString(report);
+    
+    // Add a newline to the end of the report
+    await file.writeAsString('$report\n');
     if (!config.summary) {
       print('Report written to ${config.outputPath}');
     }
