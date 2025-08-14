@@ -1,4 +1,5 @@
 import 'package:args/args.dart';
+import 'package:lcov_reporter/lcov_reporter.dart' as lcov_reporter;
 
 const String version = '1.0.0';
 
@@ -24,11 +25,15 @@ void printUsage(ArgParser argParser) {
   print(argParser.usage);
 }
 
-void main(List<String> arguments) {
-  final ArgParser argParser = buildParser();
+void printVersion() {
+  print('lcov_reporter version: $version');
+}
+
+Future<void> main(List<String> arguments) async {
+  final argParser = buildParser();
   try {
-    final ArgResults results = argParser.parse(arguments);
-    bool verbose = false;
+    final results = argParser.parse(arguments);
+    var verbose = false;
 
     // Process the parsed arguments.
     if (results.flag('help')) {
@@ -36,18 +41,18 @@ void main(List<String> arguments) {
       return;
     }
     if (results.flag('version')) {
-      print('lcov_reporter version: $version');
+      printVersion();
       return;
     }
     if (results.flag('verbose')) {
       verbose = true;
     }
 
-    // Act on the arguments provided.
-    print('Positional arguments: ${results.rest}');
     if (verbose) {
       print('[VERBOSE] All arguments: ${results.arguments}');
     }
+
+    await lcov_reporter.run();
   } on FormatException catch (e) {
     // Print usage information if an invalid argument was provided.
     print(e.message);

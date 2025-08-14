@@ -4,3 +4,5 @@ linter:
   rules:
     # I prefer to specify the arguments explicitly to be clear
     avoid_redundant_argument_values: false
+    # This is a CLI app, so we need to print stuff
+    avoid_print: false
