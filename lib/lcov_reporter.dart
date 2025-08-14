@@ -21,6 +21,7 @@ typedef _CoverageData = Map<String, Map<String, dynamic>>;
 ///   uncoveredOnly: true,
 ///   failUnder: 80.0,
 ///   summary: false,
+///   noFilter: false,
 /// );
 /// ```
 class ReporterConfig {
@@ -34,6 +35,7 @@ class ReporterConfig {
     this.uncoveredOnly = false,
     this.failUnder,
     this.summary = false,
+    this.noFilter = false,
   });
 
   /// Path to the input LCOV file.
@@ -72,6 +74,57 @@ class ReporterConfig {
   /// When `true`, shows individual file coverage percentages and total
   /// instead of the full detailed report.
   final bool summary;
+
+  /// Whether to disable filtering of common useless lines.
+  ///
+  /// When `true`, disables filtering of lines like `@override` annotations,
+  /// standalone braces, and empty lines. Shows all uncovered lines as-is.
+  final bool noFilter;
+}
+
+/// Checks if a line should be filtered out from coverage reports.
+///
+/// Filters out common "useless" lines that don't provide meaningful coverage
+/// information, such as annotations, empty lines, or boilerplate code.
+///
+/// Currently supports filtering for:
+/// - Dart: `@override` annotations, closing braces, empty lines
+///
+/// [filePath]: Path to the file (used to determine language/file type).
+/// [lineContent]: The actual content of the line to check.
+///
+/// Returns `true` if the line should be filtered out (not shown in report).
+///
+/// Example:
+/// ```dart
+/// final shouldFilter = _shouldFilterLine('lib/user.dart', '  @override');
+/// print(shouldFilter); // true
+/// ```
+bool _shouldFilterLine(String filePath, String lineContent) {
+  final trimmedLine = lineContent.trim();
+
+  // Skip empty lines
+  if (trimmedLine.isEmpty) return true;
+
+  // Dart file filters
+  if (filePath.endsWith('.dart')) {
+    // Filter @override annotations (with any amount of leading whitespace)
+    if (RegExp(r'^\s*@override\s*$').hasMatch(lineContent)) {
+      return true;
+    }
+
+    // Filter lines that are just closing braces
+    if (RegExp(r'^\s*}\s*$').hasMatch(lineContent)) {
+      return true;
+    }
+
+    // Filter lines that are just opening braces
+    if (RegExp(r'^\s*{\s*$').hasMatch(lineContent)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /// Main entry point for the LCOV reporter.
@@ -393,7 +446,7 @@ Future<void> _outputReport(String report, ReporterConfig config) async {
   if (config.outputPath != null) {
     final file = File(config.outputPath!);
     await file.parent.create(recursive: true);
-    
+
     // Add a newline to the end of the report
     await file.writeAsString('$report\n');
     if (!config.summary) {
@@ -512,12 +565,15 @@ String _detectLanguageFromExtension(String filePath) {
 ///
 /// Reads the source file and extracts the specified lines to create
 /// a formatted code block with line numbers and syntax highlighting.
+/// Optionally filters out common "useless" lines based on configuration.
 ///
 /// [lineNumbers]: List of line numbers to include in the code block.
 /// [filePath]: Path to the source file to read from.
+/// [config]: Configuration containing filtering preferences.
 ///
 /// Returns a markdown code block string with proper syntax highlighting.
 /// Shows "[Line not found]" for invalid line numbers.
+/// Returns empty string if all lines are filtered out (when filtering enabled).
 ///
 /// Example output:
 /// ```dart
@@ -528,6 +584,7 @@ String _detectLanguageFromExtension(String filePath) {
 Future<String> _generateCodeBlock(
   List<int> lineNumbers,
   String filePath,
+  ReporterConfig config,
 ) async {
   final sourceFile = File(filePath);
   var sourceLines = <String>[];
@@ -536,18 +593,30 @@ Future<String> _generateCodeBlock(
     sourceLines = await sourceFile.readAsLines();
   }
 
-  final codeLines = lineNumbers
-      .map((lineNum) {
-        if (lineNum - 1 < sourceLines.length && lineNum > 0) {
-          final code = sourceLines[lineNum - 1];
-          return '${lineNum.toString().padLeft(4)}: $code';
-        }
-        return '${lineNum.toString().padLeft(4)}: [Line not found]';
-      })
-      .join('\n');
+  final codeLines = <String>[];
+  for (final lineNum in lineNumbers) {
+    // Check if the line number is valid
+    if (lineNum <= 0 || lineNum >= sourceLines.length) {
+      codeLines.add('${lineNum.toString().padLeft(4)}: [Line not found]');
+    } else {
+      final code = sourceLines[lineNum - 1];
+
+      // Add only if the line should not be filtered out (unless filtering is disabled)
+      if (config.noFilter || !_shouldFilterLine(filePath, code)) {
+        codeLines.add('${lineNum.toString().padLeft(4)}: $code');
+      }
+    }
+  }
+
+  final codeBlock = codeLines.join('\n');
+
+  // If all lines were filtered out, return empty string
+  if (codeBlock.isEmpty) {
+    return '';
+  }
 
   final language = _detectLanguageFromExtension(filePath);
-  return '```$language\n$codeLines\n```\n';
+  return '```$language\n$codeBlock\n```\n';
 }
 
 /// Generates the complete markdown coverage report.
@@ -622,10 +691,13 @@ Future<String> _generateMarkdownReport(
     final lineGroups = _groupConsecutiveLines(uncoveredLines);
 
     for (final group in lineGroups) {
-      final codeBlock = await _generateCodeBlock(group, entry.key);
-      md
-        ..write(codeBlock)
-        ..writeln('\n');
+      final codeBlock = await _generateCodeBlock(group, entry.key, config);
+      // Only add non-empty code blocks
+      if (codeBlock.isNotEmpty) {
+        md
+          ..write(codeBlock)
+          ..writeln('\n');
+      }
     }
   }
 

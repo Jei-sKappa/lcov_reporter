@@ -39,17 +39,7 @@
 
 
 ```dart
-  32:   @override
-```
-
-
-```dart
   34:     return Object.hash(id, name);
-```
-
-
-```dart
-  37:   @override
 ```
 
 
