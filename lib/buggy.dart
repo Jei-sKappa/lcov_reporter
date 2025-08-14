@@ -617,7 +617,7 @@ Future<String> _generateCodeBlock(
   }
 
   final language = _detectLanguageFromExtension(filePath);
-  return '```$language\n$codeBlock\n```\n';
+  return '```$language\n$codeBlock\n```';
 }
 
 /// Generates the complete markdown coverage report.

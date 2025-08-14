@@ -1,4 +1,4 @@
-# Buggy
+# Buggy Report
 
 ## Total Coverage: 84.2%
 
@@ -14,17 +14,14 @@
   42:     if (todoIndex == -1) return false;
 ```
 
-
 ```dart
   44:     final todo = _todos[todoIndex];
   45:     if (!todo.isCompleted) return false;
 ```
 
-
 ```dart
   47:     _todos[todoIndex] = todo.markIncomplete();
 ```
-
 
 ## File: lib/user.dart
 
@@ -37,11 +34,9 @@
   18:     return User(id: id ?? this.id, name: name ?? this.name);
 ```
 
-
 ```dart
   34:     return Object.hash(id, name);
 ```
-
 
 ```dart
   39:     return 'User(id: $id, name: $name)';
